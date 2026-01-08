@@ -1,0 +1,382 @@
+{
+  "complaint_categories": [
+    {
+      "id": "garbage",
+      "name": "Garbage & Sanitation",
+      "name_hi": "कूड़ा और सफाई",
+      "subcategories": [
+        "Garbage not lifted",
+        "Street sweeping",
+        "Overflowing dustbin",
+        "Public toilet maintenance"
+      ],
+      "department": "Sanitation Department",
+      "sla_hours": 48,
+      "priority": "high"
+    },
+    {
+      "id": "streetlight",
+      "name": "Street Lights",
+      "name_hi": "स्ट्रीट लाइट",
+      "subcategories": [
+        "Light not working",
+        "Pole damaged",
+        "New light request"
+      ],
+      "department": "Electrical Department",
+      "sla_hours": 72,
+      "priority": "medium"
+    },
+    {
+      "id": "roads",
+      "name": "Roads & Footpaths",
+      "name_hi": "सड़क और फुटपाथ",
+      "subcategories": [
+        "Pothole",
+        "Road damaged",
+        "Footpath broken",
+        "Speed breaker issue"
+      ],
+      "department": "Engineering Department",
+      "sla_hours": 168,
+      "priority": "medium"
+    },
+    {
+      "id": "drainage",
+      "name": "Water Logging & Drainage",
+      "name_hi": "जल भराव और नाली",
+      "subcategories": [
+        "Street flooding",
+        "Drain blocked",
+        "Drain overflow",
+        "Mosquito breeding"
+      ],
+      "department": "Drainage Department",
+      "sla_hours": 24,
+      "priority": "high"
+    },
+    {
+      "id": "encroachment",
+      "name": "Encroachment",
+      "name_hi": "अतिक्रमण",
+      "subcategories": [
+        "Illegal construction",
+        "Footpath blocked",
+        "Unauthorized parking"
+      ],
+      "department": "Enforcement Department",
+      "sla_hours": 168,
+      "priority": "low"
+    },
+    {
+      "id": "building",
+      "name": "Building Issues",
+      "name_hi": "भवन संबंधी",
+      "subcategories": [
+        "Dangerous building",
+        "Unauthorized construction",
+        "Building collapse risk"
+      ],
+      "department": "Building Department",
+      "sla_hours": 48,
+      "priority": "high"
+    }
+  ],
+
+  "zones": [
+    {
+      "name": "Central Zone",
+      "code": "CZ",
+      "areas": ["Karol Bagh", "Paharganj", "Rajender Nagar", "Patel Nagar", "Dev Nagar"]
+    },
+    {
+      "name": "South Zone",
+      "code": "SZ",
+      "areas": ["Saket", "Hauz Khas", "Lajpat Nagar", "Defence Colony", "Greater Kailash", "Malviya Nagar", "Green Park"]
+    },
+    {
+      "name": "West Zone",
+      "code": "WZ",
+      "areas": ["Dwarka", "Janakpuri", "Vikaspuri", "Uttam Nagar", "Tilak Nagar", "Rajouri Garden", "Subhash Nagar"]
+    },
+    {
+      "name": "Rohini Zone",
+      "code": "RZ",
+      "areas": ["Rohini", "Pitampura", "Shalimar Bagh", "Model Town", "Prashant Vihar", "Paschim Vihar"]
+    },
+    {
+      "name": "City SP Zone",
+      "code": "CSPZ",
+      "areas": ["Chandni Chowk", "Darya Ganj", "Jama Masjid", "Sadar Bazaar", "Kashmere Gate"]
+    },
+    {
+      "name": "Shahdara North",
+      "code": "SNZ",
+      "areas": ["Seelampur", "Jafrabad", "Welcome", "Shastri Park", "Nand Nagri"]
+    },
+    {
+      "name": "Shahdara South",
+      "code": "SSZ",
+      "areas": ["Mayur Vihar", "Patparganj", "Laxmi Nagar", "Preet Vihar", "Pandav Nagar", "Vasundhara Enclave"]
+    },
+    {
+      "name": "Narela Zone",
+      "code": "NZ",
+      "areas": ["Narela", "Bawana", "Alipur", "Lampur"]
+    },
+    {
+      "name": "Najafgarh Zone",
+      "code": "NGZ",
+      "areas": ["Najafgarh", "Dwarka Rural", "Chhawla", "Kapashera"]
+    },
+    {
+      "name": "Keshavpuram Zone",
+      "code": "KPZ",
+      "areas": ["Ashok Vihar", "Wazirpur", "Tri Nagar", "Saraswati Vihar", "Shakurpur"]
+    },
+    {
+      "name": "Civil Lines Zone",
+      "code": "CLZ",
+      "areas": ["Civil Lines", "Timarpur", "Mukherjee Nagar", "GTB Nagar", "Kamla Nagar"]
+    },
+    {
+      "name": "Karol Bagh Zone",
+      "code": "KBZ",
+      "areas": ["Karol Bagh", "Pusa Road", "Anand Parbat", "Baljeet Nagar"]
+    }
+  ],
+
+  "emergency_contacts": {
+    "police": {
+      "number": "100",
+      "name": "Police Emergency",
+      "name_hi": "पुलिस आपातकालीन"
+    },
+    "fire": {
+      "number": "101",
+      "name": "Fire Brigade",
+      "name_hi": "दमकल विभाग"
+    },
+    "ambulance": {
+      "number": "102",
+      "name": "Ambulance",
+      "name_hi": "एम्बुलेंस"
+    },
+    "women_helpline": {
+      "number": "1091",
+      "name": "Women Helpline",
+      "name_hi": "महिला हेल्पलाइन"
+    },
+    "mcd_helpline": {
+      "number": "155304",
+      "name": "MCD Helpline",
+      "name_hi": "एमसीडी हेल्पलाइन"
+    },
+    "mcd_alternate": {
+      "number": "011-23227555",
+      "name": "MCD Office",
+      "name_hi": "एमसीडी कार्यालय"
+    },
+    "water_djb": {
+      "number": "1916",
+      "name": "Delhi Jal Board",
+      "name_hi": "दिल्ली जल बोर्ड"
+    },
+    "electricity_bses": {
+      "number": "19123",
+      "name": "BSES Electricity",
+      "name_hi": "बीएसईएस बिजली"
+    },
+    "disaster": {
+      "number": "1077",
+      "name": "Disaster Management",
+      "name_hi": "आपदा प्रबंधन"
+    },
+    "child_helpline": {
+      "number": "1098",
+      "name": "Child Helpline",
+      "name_hi": "चाइल्ड हेल्पलाइन"
+    },
+    "senior_citizen": {
+      "number": "1291",
+      "name": "Senior Citizen Helpline",
+      "name_hi": "वरिष्ठ नागरिक हेल्पलाइन"
+    }
+  },
+
+  "services": [
+    {
+      "id": "birth_certificate",
+      "name": "Birth Certificate",
+      "name_hi": "जन्म प्रमाण पत्र",
+      "where": "Registrar Office / Online",
+      "online_url": "https://edistrict.delhigovt.nic.in",
+      "documents": [
+        "Hospital discharge slip",
+        "Parents ID proof (Aadhaar/Voter ID)",
+        "Address proof",
+        "Marriage certificate of parents"
+      ],
+      "fee": "Free within 21 days, ₹10 after",
+      "timeline": "7 working days"
+    },
+    {
+      "id": "death_certificate",
+      "name": "Death Certificate",
+      "name_hi": "मृत्यु प्रमाण पत्र",
+      "where": "Registrar Office / Online",
+      "online_url": "https://edistrict.delhigovt.nic.in",
+      "documents": [
+        "Hospital death report",
+        "Deceased ID proof",
+        "Applicant ID proof",
+        "Proof of relation"
+      ],
+      "fee": "Free within 21 days, ₹10 after",
+      "timeline": "7 working days"
+    },
+    {
+      "id": "trade_license",
+      "name": "Trade License",
+      "name_hi": "व्यापार लाइसेंस",
+      "where": "Online at MCD Portal",
+      "online_url": "https://mcdonline.nic.in",
+      "documents": [
+        "ID proof (Aadhaar/PAN)",
+        "Address proof of shop",
+        "NOC from landlord/ownership proof",
+        "Shop photograph",
+        "Partnership deed (if applicable)"
+      ],
+      "fee": "₹500-5000 based on business type and area",
+      "timeline": "15 working days"
+    },
+    {
+      "id": "property_tax",
+      "name": "Property Tax Payment",
+      "name_hi": "संपत्ति कर भुगतान",
+      "where": "Online or Ward Office",
+      "online_url": "https://mcdonline.nic.in",
+      "documents": [
+        "Property ID or UPIC",
+        "Previous tax receipts (optional)"
+      ],
+      "fee": "As per property assessment",
+      "timeline": "Instant online, same day at office"
+    },
+    {
+      "id": "building_permission",
+      "name": "Building Permission",
+      "name_hi": "भवन निर्माण अनुमति",
+      "where": "Building Department / Online",
+      "online_url": "https://mcdonline.nic.in",
+      "documents": [
+        "Land ownership documents",
+        "Architect-approved building plan",
+        "NOC from Fire Department",
+        "NOC from Delhi Jal Board",
+        "Structural stability certificate"
+      ],
+      "fee": "Based on construction area and zone",
+      "timeline": "30-60 working days"
+    },
+    {
+      "id": "marriage_registration",
+      "name": "Marriage Registration",
+      "name_hi": "विवाह पंजीकरण",
+      "where": "SDM Office / Online",
+      "online_url": "https://edistrict.delhigovt.nic.in",
+      "documents": [
+        "Marriage invitation card",
+        "Marriage photographs",
+        "ID proof of both spouses",
+        "Address proof",
+        "Witness ID proofs (2)"
+      ],
+      "fee": "₹100",
+      "timeline": "15-30 working days"
+    }
+  ],
+
+  "sla_escalation": {
+    "level1": {
+      "time_after_sla": "0 hours",
+      "escalate_to": "Junior Engineer / Sanitary Inspector",
+      "action": "Automatic reminder sent"
+    },
+    "level2": {
+      "time_after_sla": "24 hours",
+      "escalate_to": "Assistant Engineer",
+      "action": "Email notification to AE"
+    },
+    "level3": {
+      "time_after_sla": "48 hours",
+      "escalate_to": "Executive Engineer",
+      "action": "Dashboard alert to EE"
+    },
+    "level4": {
+      "time_after_sla": "72 hours",
+      "escalate_to": "Zonal Deputy Commissioner",
+      "action": "Escalation report to DC"
+    },
+    "level5": {
+      "time_after_sla": "1 week",
+      "escalate_to": "Commissioner",
+      "action": "Can be raised on CPGRAMS"
+    }
+  },
+
+  "faqs": [
+    {
+      "q": "How to check my complaint status?",
+      "q_hi": "मेरी शिकायत की स्थिति कैसे जांचें?",
+      "a": "Visit mcdonline.nic.in → Grievance Status → Enter your complaint number. Or call 155304.",
+      "a_hi": "mcdonline.nic.in पर जाएं → शिकायत स्थिति → अपना शिकायत नंबर डालें। या 155304 पर कॉल करें।"
+    },
+    {
+      "q": "What if my complaint is not resolved in time?",
+      "q_hi": "अगर मेरी शिकायत समय पर हल नहीं होती?",
+      "a": "Complaint auto-escalates to senior officers. You can also file on CPGRAMS (pgportal.gov.in) for central escalation.",
+      "a_hi": "शिकायत अपने आप वरिष्ठ अधिकारियों को जाती है। आप CPGRAMS (pgportal.gov.in) पर भी शिकायत कर सकते हैं।"
+    },
+    {
+      "q": "How to pay property tax online?",
+      "q_hi": "ऑनलाइन संपत्ति कर कैसे भरें?",
+      "a": "Visit mcdonline.nic.in → Property Tax → Enter property ID or search by address → Pay via netbanking/UPI/card.",
+      "a_hi": "mcdonline.nic.in पर जाएं → Property Tax → प्रॉपर्टी ID डालें या पता से खोजें → नेटबैंकिंग/UPI से भुगतान करें।"
+    },
+    {
+      "q": "Where is my ward office?",
+      "q_hi": "मेरा वार्ड ऑफिस कहां है?",
+      "a": "Tell me your area or colony name and I will find the nearest ward office for you.",
+      "a_hi": "अपने इलाके या कॉलोनी का नाम बताएं, मैं आपका नजदीकी वार्ड ऑफिस बताता हूं।"
+    },
+    {
+      "q": "How to apply for trade license?",
+      "q_hi": "व्यापार लाइसेंस कैसे बनवाएं?",
+      "a": "Visit mcdonline.nic.in → Trade License → New Application → Fill form, upload documents, pay fee. Processing takes 15 days.",
+      "a_hi": "mcdonline.nic.in पर जाएं → Trade License → New Application → फॉर्म भरें, दस्तावेज अपलोड करें, फीस भरें। 15 दिन में बन जाता है।"
+    },
+    {
+      "q": "What complaints can MCD handle?",
+      "q_hi": "MCD किन शिकायतों को देखता है?",
+      "a": "MCD handles: Garbage, street lights, roads, drains, encroachment, building issues, trade licenses, property tax. For water supply call DJB 1916, for electricity call BSES 19123.",
+      "a_hi": "MCD देखता है: कूड़ा, स्ट्रीट लाइट, सड़कें, नालियां, अतिक्रमण, भवन मुद्दे। पानी के लिए DJB 1916, बिजली के लिए BSES 19123 पर कॉल करें।"
+    },
+    {
+      "q": "How long does complaint resolution take?",
+      "q_hi": "शिकायत हल होने में कितना समय लगता है?",
+      "a": "Depends on issue: Garbage 48 hours, Street lights 72 hours, Roads 7 days, Water logging 24 hours. Urgent issues are prioritized.",
+      "a_hi": "मुद्दे पर निर्भर: कूड़ा 48 घंटे, स्ट्रीट लाइट 72 घंटे, सड़क 7 दिन, जल भराव 24 घंटे। जरूरी मुद्दों को प्राथमिकता मिलती है।"
+    }
+  ],
+
+  "common_issues_keywords": {
+    "garbage": ["garbage", "kuda", "kachra", "dustbin", "safai", "sweeping", "cleaning", "ganda", "smell", "badbu"],
+    "streetlight": ["light", "bijli", "lamp", "pole", "dark", "andhera", "street light", "bulb", "roshni"],
+    "roads": ["pothole", "road", "footpath", "sadak", "gaddha", "broken", "tuta", "damaged", "crater", "cave"],
+    "drainage": ["water", "flooding", "drain", "nali", "naali", "pani", "jal", "bharav", "overflow", "blocked", "macchar", "mosquito"],
+    "encroachment": ["encroachment", "illegal", "kabza", "atikraman", "rehri", "thela", "unauthorized", "footpath blocked"],
+    "building": ["building", "construction", "collapse", "dangerous", "bhawan", "khatarnak", "crack", "tilted", "unsafe"]
+  }
+}

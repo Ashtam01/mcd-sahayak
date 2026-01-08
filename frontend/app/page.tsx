@@ -32,6 +32,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+import VoiceAgent from './components/VoiceAgent';
 
 // Mock Data
 const CHART_DATA = [
@@ -71,10 +72,23 @@ const QUICK_ACTIONS = [
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [vapiConfig, setVapiConfig] = useState({ publicKey: '', assistantId: '' });
 
   useEffect(() => {
     setMounted(true);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    
+    // Fetch Vapi config from backend
+    fetch('http://localhost:8000/api/config')
+      .then(res => res.json())
+      .then(data => {
+        setVapiConfig({
+          publicKey: data.vapi_public_key || '',
+          assistantId: data.vapi_assistant_id || ''
+        });
+      })
+      .catch(err => console.error('Failed to fetch config:', err));
+    
     return () => clearInterval(timer);
   }, []);
 
@@ -324,6 +338,14 @@ export default function Dashboard() {
               View All Activity
               <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
+          </div>
+
+          {/* Voice Agent */}
+          <div className="xl:col-span-1">
+            <VoiceAgent 
+              publicKey={vapiConfig.publicKey}
+              assistantId={vapiConfig.assistantId}
+            />
           </div>
 
         </div>
