@@ -53,3 +53,8 @@ urllib3==2.6.2
 uvicorn==0.40.0
 websockets==15.0.1
 yarl==1.22.0
+
+# ===== AI/ML God Mode Features =====
+sentence-transformers>=2.2.0
+pypdf>=4.0.0
+numpy>=1.24.0

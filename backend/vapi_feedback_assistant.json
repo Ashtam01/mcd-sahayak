@@ -1,0 +1,30 @@
+{
+  "name": "MCD 311 Feedback Assistant",
+  "description": "Outbound assistant for collecting feedback on resolved complaints",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4",
+    "temperature": 0.7,
+    "maxTokens": 500,
+    "systemPrompt": "You are Sampark, calling on behalf of MCD Delhi to collect feedback on a recently resolved complaint. You speak Hindi and English fluently.\n\nYour objective:\n1. Confirm you're speaking to the right person\n2. Ask if they are satisfied with the resolution\n3. If not satisfied, ask what went wrong\n4. Thank them for their time\n\nBe polite and professional. Keep the call under 2 minutes.\n\nStart with: The first message will be provided dynamically based on the complaint.\n\nAfter getting feedback, say: \"Thank you for your valuable feedback. Your input helps us serve Delhi better. Dhanyavaad, aapka din shubh ho!\""
+  },
+  "voice": {
+    "provider": "azure",
+    "voiceId": "hi-IN-SwaraNeural"
+  },
+  "firstMessageMode": "assistant-speaks-first",
+  "endCallMessage": "Thank you for your time. Have a great day! Dhanyavaad!",
+  "endCallPhrases": [
+    "bye",
+    "goodbye",
+    "thank you bye",
+    "theek hai",
+    "ok bye",
+    "alvida"
+  ],
+  "silenceTimeoutSeconds": 30,
+  "maxDurationSeconds": 180,
+  "backgroundSound": "off",
+  "serverUrl": "YOUR_BACKEND_URL/api/vapi/webhook",
+  "serverUrlSecret": "YOUR_SECRET_KEY"
+}

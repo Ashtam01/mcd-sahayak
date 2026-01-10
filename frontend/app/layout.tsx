@@ -1,13 +1,16 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import 'leaflet/dist/leaflet.css'
+import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
+import { Toaster } from '@/components/ui/toaster'
 
 // Load the Inter font
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Sampark Command Center',
-  description: 'Real-time Governance Monitoring System - Hack4 Delhi',
+  title: 'Sampark - Admin Panel',
+  description: 'AI Voice Agent Platform for Municipal Corporation of Delhi',
 }
 
 export default function RootLayout({
@@ -17,8 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* Apply the font to the body */}
-      <body className={`${inter.className} bg-slate-950 text-slate-100 antialiased`}>{children}</body>
+      <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
+        <LayoutWrapper>{children}</LayoutWrapper>
+        <Toaster />
+      </body>
     </html>
   )
 }
