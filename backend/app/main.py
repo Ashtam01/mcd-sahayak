@@ -65,6 +65,17 @@ class Config:
     TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
     TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
     TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
+    
+    # CORS Configuration
+    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",")
+    
+    @classmethod
+    def validate(cls) -> None:
+        """Validate required environment variables"""
+        required = ["SUPABASE_URL", "SUPABASE_KEY"]
+        missing = [var for var in required if not os.environ.get(var)]
+        if missing:
+            raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
 config = Config()
 
@@ -74,12 +85,13 @@ app = FastAPI(
     description="The brain behind MCD's AI Workforce"
 )
 
+# CORS Configuration - Restrict to known origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=config.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # ============================================================
@@ -121,9 +133,22 @@ DELHI_ZONES = {
     "NAJAFGARH": {"coords": (28.6094, 76.9798), "areas": ["najafgarh", "dichaon kalan", "chhawla"]}
 }
 
-SLA_MATRIX = {
-    "CLEANLINESS": 24, "ELECTRICAL": 48, "VETERINARY": 24, 
-    "ENGINEERING": 72, "HORTICULTURE": 48, "PUBLIC_HEALTH": 24
+# SLA Hours by category - Consolidated single source of truth
+SLA_HOURS_BY_CATEGORY = {
+    "VETERINARY": 24,
+    "TOLL_TAX": 48,
+    "HORTICULTURE": 48,
+    "ELECTRICAL": 48,
+    "ENGINEERING_BUILDING": 72,
+    "PARKING_CELL": 24,
+    "PUBLIC_HEALTH": 24,
+    "GENERAL_BRANCH": 48,
+    "CLEANLINESS": 24,
+    "ENGINEERING_WORKS": 72,
+    "ENGINEERING": 72,
+    "ADVERTISEMENT": 48,
+    "IT_DEPARTMENT": 72,
+    "GENERAL": 48,  # Default fallback category
 }
 
 # ============================================================
@@ -132,30 +157,49 @@ SLA_MATRIX = {
 
 def get_embedding(text: str) -> List[float]:
     """Generates a 384-dim vector using the local CPU model."""
-    if not embedding_model:
+    if not embedding_model or not text or not text.strip():
         return []
-    return embedding_model.encode(text).tolist()
+    try:
+        return embedding_model.encode(text.strip()).tolist()
+    except Exception as e:
+        print(f"⚠️ Embedding generation failed: {e}")
+        return []
 
-def detect_zone_and_coords(text: str):
-    """Spatial extraction logic"""
-    text = text.lower()
+def detect_zone_and_coords(text: str) -> tuple[str, tuple[float, float]]:
+    """Spatial extraction logic - maps location text to Delhi zone and coordinates"""
+    if not text or not text.strip():
+        return "CENTRAL", (28.6139, 77.2090)  # Default to Delhi Center
+    
+    text_lower = text.lower().strip()
     for zone, data in DELHI_ZONES.items():
         for area in data["areas"]:
-            if area in text:
+            if area in text_lower:
                 return zone, data["coords"]
-    return "CENTRAL", (28.6139, 77.2090) # Default to Delhi Center
+    return "CENTRAL", (28.6139, 77.2090)  # Default to Delhi Center
 
-async def send_sms(phone: str, message: str):
+async def send_sms(phone: str, message: str) -> None:
     """Dispatches SMS via Twilio"""
-    if not config.TWILIO_ACCOUNT_SID: return
+    if not config.TWILIO_ACCOUNT_SID:
+        return
+    
+    # Validate phone number format (basic validation)
+    if not phone or len(phone.strip()) < 10:
+        print(f"⚠️ Invalid phone number: {phone}")
+        return
+    
     try:
-        async with httpx.AsyncClient() as client:
-            await client.post(
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(
                 f"https://api.twilio.com/2010-04-01/Accounts/{config.TWILIO_ACCOUNT_SID}/Messages.json",
                 auth=(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN),
-                data={"From": config.TWILIO_PHONE_NUMBER, "To": phone, "Body": message}
+                data={"From": config.TWILIO_PHONE_NUMBER, "To": phone.strip(), "Body": message[:1600]}  # SMS limit
             )
-            print(f"📨 SMS Sent to {phone}")
+            if response.status_code == 201:
+                print(f"📨 SMS Sent to {phone}")
+            else:
+                print(f"⚠️ SMS API returned status {response.status_code}")
+    except httpx.TimeoutException:
+        print(f"❌ SMS timeout for {phone}")
     except Exception as e:
         print(f"❌ SMS Failed: {e}")
 
@@ -377,17 +421,19 @@ async def vapi_webhook(request: Request, background_tasks: BackgroundTasks):
                         "zone": zone,
                         "latitude": lat, 
                         "longitude": lng,
-                        "citizen_phone": phone,
-                        "status": "Open",
-                        "sla_hours": SLA_MATRIX.get(cat, 48)
+                    "citizen_phone": phone,
+                    "status": "Open",
+                    "sla_hours": SLA_HOURS_BY_CATEGORY.get(cat, 48)
                     }).execute()
                     
                     # SMS Notification
                     if phone:
-                        sms_txt = f"MCD Ticket: {ticket_id}. Cat: {cat}. Status: Open. SLA: {SLA_MATRIX.get(cat, 48)}hrs."
+                        sla_hours = SLA_HOURS_BY_CATEGORY.get(cat, 48)
+                        sms_txt = f"MCD Ticket: {ticket_id}. Cat: {cat}. Status: Open. SLA: {sla_hours}hrs."
                         background_tasks.add_task(send_sms, phone, sms_txt)
                     
-                    result = f"Complaint logged. Ticket ID {ticket_id}. SLA is {SLA_MATRIX.get(cat, 48)} hours. SMS sent."
+                    sla_hours = SLA_HOURS_BY_CATEGORY.get(cat, 48)
+                    result = f"Complaint logged. Ticket ID {ticket_id}. SLA is {sla_hours} hours. SMS sent."
 
                 results.append({
                     "toolCallId": tool["id"],
@@ -415,13 +461,7 @@ except FileNotFoundError:
     MCD_KNOWLEDGE = {}
     print("⚠️ mcd_knowledge.json not found - using empty fallback")
 
-# SLA Hours by category
-SLA_HOURS = {
-    "VETERINARY": 24, "TOLL_TAX": 48, "HORTICULTURE": 48, "ELECTRICAL": 48,
-    "ENGINEERING_BUILDING": 72, "PARKING_CELL": 24, "PUBLIC_HEALTH": 24,
-    "GENERAL_BRANCH": 48, "CLEANLINESS": 24, "ENGINEERING_WORKS": 72,
-    "ADVERTISEMENT": 48, "IT_DEPARTMENT": 72, "ENGINEERING": 72
-}
+# SLA_HOURS removed - use SLA_HOURS_BY_CATEGORY instead
 
 # ============================================================
 # 📝 PYDANTIC MODELS
@@ -435,6 +475,15 @@ class ComplaintCreate(BaseModel):
     citizen_name: Optional[str] = None
     priority: Optional[str] = "medium"
     source: Optional[str] = "web"
+    
+    def model_post_init(self, __context) -> None:
+        """Validate complaint data after initialization"""
+        if not self.description or len(self.description.strip()) < 5:
+            raise ValueError("Description must be at least 5 characters")
+        if not self.location or len(self.location.strip()) < 3:
+            raise ValueError("Location must be at least 3 characters")
+        if self.priority and self.priority not in ["low", "medium", "high", "critical"]:
+            raise ValueError("Priority must be one of: low, medium, high, critical")
 
 class ComplaintUpdate(BaseModel):
     status: Optional[str] = None
@@ -460,24 +509,32 @@ async def create_complaint(data: ComplaintCreate, background_tasks: BackgroundTa
     if not supabase:
         raise HTTPException(status_code=500, detail="Database not connected")
     
-    zone, (lat, lng) = detect_zone_and_coords(data.location)
-    sla_hours = SLA_HOURS.get(data.category, 48)
-    
     try:
+        # Validate input
+        if not data.description or len(data.description.strip()) < 5:
+            raise HTTPException(status_code=400, detail="Description must be at least 5 characters")
+        if not data.location or len(data.location.strip()) < 3:
+            raise HTTPException(status_code=400, detail="Location must be at least 3 characters")
+        if data.priority and data.priority not in ["low", "medium", "high", "critical"]:
+            raise HTTPException(status_code=400, detail="Invalid priority value")
+        
+        zone, (lat, lng) = detect_zone_and_coords(data.location)
+        sla_hours = SLA_HOURS_BY_CATEGORY.get(data.category, 48)
+        
         insert_data = {
-            "category": data.category,
-            "subcategory": data.subcategory,
-            "description": data.description,
-            "location": data.location,
+            "category": data.category.strip(),
+            "subcategory": data.subcategory.strip() if data.subcategory else None,
+            "description": data.description.strip(),
+            "location": data.location.strip(),
             "latitude": lat,
             "longitude": lng,
             "zone": zone,
-            "citizen_phone": data.citizen_phone,
-            "citizen_name": data.citizen_name,
-            "priority": data.priority,
+            "citizen_phone": data.citizen_phone.strip() if data.citizen_phone else None,
+            "citizen_name": data.citizen_name.strip() if data.citizen_name else None,
+            "priority": data.priority or "medium",
             "sla_hours": sla_hours,
             "status": "Open",
-            "source": data.source
+            "source": data.source or "web"
         }
         
         response = supabase.table("complaints").insert(insert_data).execute()
@@ -487,14 +544,17 @@ async def create_complaint(data: ComplaintCreate, background_tasks: BackgroundTa
             complaint_number = complaint.get("complaint_number")
             
             # Log activity
-            supabase.table("activity_log").insert({
-                "activity_type": "complaint_created",
-                "title": f"New {data.category} complaint",
-                "description": f"Complaint {complaint_number} registered via {data.source}",
-                "complaint_id": complaint.get("id"),
-                "zone": zone,
-                "location": data.location
-            }).execute()
+            try:
+                supabase.table("activity_log").insert({
+                    "activity_type": "complaint_created",
+                    "title": f"New {data.category} complaint",
+                    "description": f"Complaint {complaint_number} registered via {data.source}",
+                    "complaint_id": complaint.get("id"),
+                    "zone": zone,
+                    "location": data.location
+                }).execute()
+            except Exception as log_error:
+                print(f"Warning: Failed to log activity: {log_error}")
             
             # Send SMS
             if data.citizen_phone:
@@ -509,8 +569,11 @@ async def create_complaint(data: ComplaintCreate, background_tasks: BackgroundTa
             }
         
         raise HTTPException(status_code=500, detail="Failed to create complaint")
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Create complaint error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create complaint")
 
 @app.get("/api/complaints")
 def get_complaints(
@@ -523,6 +586,10 @@ def get_complaints(
 ):
     if not supabase:
         return {"complaints": [], "total": 0}
+    
+    # Validate limit and offset
+    limit = max(1, min(limit, 500))  # Clamp between 1 and 500
+    offset = max(0, offset)  # Ensure non-negative
     
     try:
         query = supabase.table("complaints")\
@@ -542,7 +609,8 @@ def get_complaints(
         response = query.execute()
         return {"complaints": response.data or [], "total": response.count or 0}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Get complaints error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch complaints")
 
 @app.get("/api/complaints/{complaint_id}")
 def get_complaint(complaint_id: str):
@@ -570,38 +638,56 @@ async def update_complaint(complaint_id: str, data: ComplaintUpdate, background_
     if not supabase:
         raise HTTPException(status_code=500, detail="Database not connected")
     
+    # Validate complaint_id format
+    if not complaint_id or not complaint_id.strip():
+        raise HTTPException(status_code=400, detail="Invalid complaint ID")
+    
+    # Validate status if provided
+    if data.status and data.status not in ["Open", "Assigned", "In Progress", "Resolved", "Closed", "Escalated"]:
+        raise HTTPException(status_code=400, detail="Invalid status value")
+    
     try:
         current = supabase.table("complaints").select("*").eq("id", complaint_id).single().execute()
         if not current.data:
             raise HTTPException(status_code=404, detail="Complaint not found")
         
         complaint = current.data
-        update_data = {k: v for k, v in data.dict().items() if v is not None}
+        update_data = {k: v for k, v in data.model_dump(exclude_unset=True).items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
         update_data["updated_at"] = datetime.now().isoformat()
         
         if data.status == "Resolved" and complaint.get("status") != "Resolved":
             update_data["resolved_at"] = datetime.now().isoformat()
-            if complaint.get("citizen_phone"):
-                sms_message = f"MCD Sampark: Your complaint {complaint.get('complaint_number')} has been RESOLVED. Thank you!"
-                background_tasks.add_task(send_sms, complaint["citizen_phone"], sms_message)
+            citizen_phone = complaint.get("citizen_phone")
+            if citizen_phone:
+                complaint_number = complaint.get("complaint_number", "N/A")
+                sms_message = f"MCD Sampark: Your complaint {complaint_number} has been RESOLVED. Thank you!"
+                background_tasks.add_task(send_sms, citizen_phone, sms_message)
         
         response = supabase.table("complaints").update(update_data).eq("id", complaint_id).execute()
         
         if data.status:
-            supabase.table("activity_log").insert({
-                "activity_type": "status_changed",
-                "title": f"Status changed to {data.status}",
-                "complaint_id": complaint_id,
-                "zone": complaint.get("zone"),
-                "old_value": complaint.get("status"),
-                "new_value": data.status
-            }).execute()
+            try:
+                supabase.table("activity_log").insert({
+                    "activity_type": "status_changed",
+                    "title": f"Status changed to {data.status}",
+                    "complaint_id": complaint_id,
+                    "zone": complaint.get("zone"),
+                    "old_value": complaint.get("status"),
+                    "new_value": data.status
+                }).execute()
+            except Exception as log_error:
+                print(f"Warning: Failed to log activity: {log_error}")
         
         return {"success": True, "data": response.data[0] if response.data else None}
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Update complaint error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update complaint")
 
 # ============================================================
 # 📊 API ENDPOINTS - DASHBOARD & ANALYTICS
@@ -668,7 +754,8 @@ def get_activity(zone: Optional[str] = None, limit: int = 20):
             query = query.eq("zone", zone)
         response = query.execute()
         return {"activities": response.data or []}
-    except:
+    except Exception as e:
+        print(f"Activity fetch error: {e}")
         return {"activities": []}
 
 @app.get("/api/categories")
@@ -678,7 +765,8 @@ def get_categories():
     try:
         response = supabase.table("complaint_categories").select("*").eq("is_active", True).order("sort_order").execute()
         return {"categories": response.data or []}
-    except:
+    except Exception as e:
+        print(f"Categories fetch error: {e}")
         return {"categories": [
             {"code": "CLEANLINESS", "name": "Cleanliness"},
             {"code": "ELECTRICAL", "name": "Electrical"},
@@ -707,7 +795,8 @@ def get_heatmap(zone: Optional[str] = None):
                     "category": row.get("category")
                 })
         return {"points": points, "count": len(points)}
-    except:
+    except Exception as e:
+        print(f"Heatmap fetch error: {e}")
         return {"points": []}
 
 # ============================================================
@@ -719,14 +808,26 @@ async def rag_search(query: str):
     if not embedding_model or not supabase:
         raise HTTPException(status_code=503, detail="RAG not available")
     
-    query_vec = get_embedding(query)
-    matches = supabase.rpc("match_documents", {
-        "query_embedding": query_vec,
-        "match_threshold": 0.3,
-        "match_count": 3
-    }).execute()
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Query parameter is required")
     
-    return {"query": query, "matches": matches.data or []}
+    try:
+        query_vec = get_embedding(query.strip())
+        if not query_vec:
+            raise HTTPException(status_code=503, detail="Failed to generate embedding")
+        
+        matches = supabase.rpc("match_documents", {
+            "query_embedding": query_vec,
+            "match_threshold": 0.3,
+            "match_count": 3
+        }).execute()
+        
+        return {"query": query, "matches": matches.data or []}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"RAG search error: {e}")
+        raise HTTPException(status_code=500, detail="RAG search failed")
 
 # ============================================================
 # �📡 RUNNER

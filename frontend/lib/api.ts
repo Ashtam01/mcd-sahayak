@@ -43,12 +43,12 @@ export async function fetchDashboardStats(zone?: string): Promise<DashboardStats
     const data = await res.json();
     
     return {
-      totalComplaints: data.total_complaints || 0,
-      resolvedToday: data.resolved || 0,
-      avgResolutionTime: `${(data.avg_resolution_hours || 4.2).toFixed(1)}h`,
-      liveAgents: data.active_agents || 0,
-      complaintTrend: data.complaint_trend || 0,
-      resolutionTrend: data.resolution_trend || 0,
+      totalComplaints: data.total_complaints || data.totalComplaints || 0,
+      resolvedToday: data.resolved_today || data.resolvedToday || data.resolved || 0,
+      avgResolutionTime: data.avgResolutionTime || `${(data.avg_resolution_hours || 4.2).toFixed(1)}h`,
+      liveAgents: data.live_agents || data.liveAgents || 0,
+      complaintTrend: data.complaint_trend || data.complaintTrend || 0,
+      resolutionTrend: data.resolution_trend || data.resolutionTrend || 0,
     };
   } catch (error) {
     console.error('Dashboard stats error:', error);
@@ -77,10 +77,10 @@ export async function fetchRecentActivity(zone?: string, limit = 5): Promise<Act
     
     return (data.activities || []).map((item: any) => ({
       id: item.id,
-      type: item.type,
-      title: item.title,
+      type: item.activity_type || item.type || 'complaint',
+      title: item.title || 'Activity',
       location: item.location || 'Unknown',
-      time: formatRelativeTime(item.created_at),
+      time: formatRelativeTime(item.created_at || item.time),
       zone: item.zone,
     }));
   } catch (error) {
