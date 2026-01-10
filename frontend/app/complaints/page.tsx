@@ -37,7 +37,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { supabase, type Complaint } from '@/lib/supabase';
-import { useZoneStore } from '@/lib/store';
+import { useZoneStore, ZONES as ZONE_OPTIONS } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
 
 // Extended complaint type with call data
@@ -76,20 +76,8 @@ const CATEGORIES = [
   'Others',
 ];
 
-// Delhi zones
-const ZONES = [
-  'Central Delhi',
-  'East Delhi',
-  'New Delhi',
-  'North Delhi',
-  'North East Delhi',
-  'North West Delhi',
-  'Shahdara',
-  'South Delhi',
-  'South East Delhi',
-  'South West Delhi',
-  'West Delhi',
-];
+// Map zone values to display names (using zones from store to avoid duplication)
+const ZONES = ZONE_OPTIONS.map(z => z.label.replace('🏛️ ', '').replace('🏢 ', ''));
 
 function getStatusStyle(status: string) {
   const normalizedStatus = status?.toLowerCase().replace(' ', '-');
@@ -205,7 +193,7 @@ export default function ComplaintsPage() {
             status: (c.status || 'Open').toLowerCase().replace(' ', '-') as any,
             priority: c.priority || 'medium',
             citizen_name: c.citizen_name || 'Anonymous',
-            citizen_phone: c.caller_phone,
+            citizen_phone: c.citizen_phone || c.caller_phone,
             zone: c.zone,
             ward: c.ward,
             assigned_to: c.assigned_to,
@@ -256,7 +244,7 @@ export default function ComplaintsPage() {
             status: (c.status || 'Open').toLowerCase().replace(' ', '-') as any,
             priority: c.priority || 'medium',
             citizen_name: c.citizen_name || 'Anonymous',
-            citizen_phone: c.caller_phone,
+            citizen_phone: c.citizen_phone || c.caller_phone,
             zone: c.zone,
             ward: c.ward,
             ai_summary: c.ai_summary || c.description,
