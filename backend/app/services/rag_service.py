@@ -15,11 +15,19 @@ def generate_embedding(text: str) -> List[float]:
     """
     return model.encode(text).tolist()
 
-def ingest_document(file_bytes: bytes, filename: str, metadata: dict = None) -> dict:
+import uuid
+from datetime import datetime
+
+# ... existing code ...
+
+def ingest_document(file_bytes: bytes, filename: str, description: str = "", metadata: dict = None) -> dict:
     """
     Parses a PDF, chunks the text, vectors it, and stores in Supabase.
     """
     try:
+        doc_id = str(uuid.uuid4())
+        created_at = datetime.now().isoformat()
+        
         # 1. Upload to Supabase Storage
         file_path = f"schemes/{int(time.time())}_{filename}"
         storage_response = supabase.storage.from_("documents").upload(
@@ -30,10 +38,6 @@ def ingest_document(file_bytes: bytes, filename: str, metadata: dict = None) -> 
         
         # Get Public URL
         public_url_response = supabase.storage.from_("documents").get_public_url(file_path)
-        # The supabase-py client usually returns the string URL directly or in a response property
-        # depending on version. safe check:
-        # public_url = public_url_response if isinstance(public_url_response, str) else public_url_response.get("publicURL", "")
-        # Actually in recent supabase-py: get_public_url returns a string.
         public_url = public_url_response
 
         # 2. Parse PDF
@@ -46,7 +50,6 @@ def ingest_document(file_bytes: bytes, filename: str, metadata: dict = None) -> 
             return {"status": "error", "message": "No text found in PDF"}
 
         # 3. Chunk Text
-        # Simple character-based chunking for now
         chunk_size = 1000
         overlap = 200
         chunks = []
@@ -60,17 +63,27 @@ def ingest_document(file_bytes: bytes, filename: str, metadata: dict = None) -> 
             
         # 4. Generate Embeddings & Store
         stored_count = 0
+        
+        # Common metadata for all chunks
+        doc_metadata = {
+            "doc_id": doc_id,
+            "filename": filename,
+            "description": description,
+            "storage_path": file_path,
+            "public_url": public_url,
+            "created_at": created_at,
+            "type": "scheme_doc",
+            **(metadata or {})
+        }
+
         for i, chunk_text in enumerate(chunks):
             embedding = generate_embedding(chunk_text)
             
             row = {
                 "content": chunk_text,
                 "metadata": {
-                    "filename": filename,
-                    "storage_path": file_path,
-                    "public_url": public_url,
-                    "chunk_index": i,
-                    **(metadata or {})
+                    **doc_metadata,
+                    "chunk_index": i
                 },
                 "embedding": embedding
             }
@@ -83,7 +96,9 @@ def ingest_document(file_bytes: bytes, filename: str, metadata: dict = None) -> 
             "status": "success", 
             "chunks_processed": stored_count,
             "filename": filename,
-            "public_url": public_url
+            "description": description,
+            "public_url": public_url,
+            "doc_id": doc_id
         }
 
     except Exception as e:

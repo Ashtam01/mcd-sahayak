@@ -28,7 +28,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RealtimeHeatmap } from '@/components/dashboard/RealtimeHeatmap';
+import BroadcastPanel from '@/components/BroadcastPanel';
 import VoiceAgent from '@/app/components/VoiceAgent';
+
+// ... (keep existing imports)
+
 import { useZoneStore, ZONES, useSidebarStore } from '@/lib/store';
 import { fetchDashboardStats, fetchRecentActivity, type DashboardStats, type Activity as ActivityType } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
@@ -439,9 +443,9 @@ export default function DashboardPage() {
   const currentZone = selectedZone || 'all';
   const zoneName = selectedZone
     ? (() => {
-        const zone = ZONES.find((z) => z.value === selectedZone);
-        return zone ? t.zones[zone.labelKey as keyof typeof t.zones] : 'Selected Zone';
-      })()
+      const zone = ZONES.find((z) => z.value === selectedZone);
+      return zone ? t.zones[zone.labelKey as keyof typeof t.zones] : 'Selected Zone';
+    })()
     : t.zones.allDelhi;
 
   // AI Insights based on data
@@ -642,11 +646,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Enhanced KPI Cards - Responsive grid based on sidebar state */}
-      <div className={`grid gap-3 mb-2 ${
-        isCollapsed 
-          ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6' 
-          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
-      }`}>
+      <div className={`grid gap-3 mb-2 ${isCollapsed
+        ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6'
+        : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
+        }`}>
         <KPICard
           title={t.dashboard.totalComplaints}
           value={isLoading ? '...' : stats.totalComplaints.toLocaleString()}
@@ -694,15 +697,16 @@ export default function DashboardPage() {
       {/* ============================================
           CALL-CENTERED LOWER SECTION
           ============================================ */}
-      
+
       {/* Primary Section: Voice Agent (Dominant) */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
         {/* Left: Voice Agent - Takes 3 columns (60%) - VISUALLY DOMINANT */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 space-y-6">
           <VoiceAgent
             publicKey={process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || ''}
             assistantId={process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || ''}
           />
+          <BroadcastPanel />
         </div>
 
         {/* Right: Map + Activity - Takes 2 columns (40%) - SECONDARY */}
@@ -711,7 +715,7 @@ export default function DashboardPage() {
           <div className="relative">
             <RealtimeHeatmap />
           </div>
-          
+
           {/* Recent Activity - Compact */}
           <RecentActivityCard activities={activities} />
         </div>

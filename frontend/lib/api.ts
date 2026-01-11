@@ -1,7 +1,7 @@
 // API client for Sampark backend
 // This replaces all mock data with real API calls
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface DashboardStats {
   totalComplaints: number;
@@ -33,15 +33,15 @@ export interface ZoneStats {
 // Fetch dashboard statistics
 export async function fetchDashboardStats(zone?: string): Promise<DashboardStats> {
   try {
-    const url = zone && zone !== 'all' 
+    const url = zone && zone !== 'all'
       ? `${API_BASE}/api/dashboard-stats?zone=${zone}`
       : `${API_BASE}/api/dashboard-stats`;
-    
+
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch stats');
-    
+
     const data = await res.json();
-    
+
     return {
       totalComplaints: data.total_complaints || 0,
       resolvedToday: data.resolved || 0,
@@ -69,12 +69,12 @@ export async function fetchRecentActivity(zone?: string, limit = 5): Promise<Act
   try {
     const params = new URLSearchParams({ limit: String(limit) });
     if (zone && zone !== 'all') params.append('zone', zone);
-    
+
     const res = await fetch(`${API_BASE}/api/activity?${params}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch activity');
-    
+
     const data = await res.json();
-    
+
     return (data.activities || []).map((item: any) => ({
       id: item.id,
       type: item.type,
@@ -114,10 +114,10 @@ export async function fetchComplaints(options: {
     if (options.status && options.status !== 'all') params.append('status', options.status);
     if (options.limit) params.append('limit', String(options.limit));
     if (options.search) params.append('search', options.search);
-    
+
     const res = await fetch(`${API_BASE}/api/complaints?${params}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch complaints');
-    
+
     const data = await res.json();
     return data.complaints || [];
   } catch (error) {
@@ -132,11 +132,25 @@ export async function fetchHeatmapPoints(zone?: string) {
     const params = zone && zone !== 'all' ? `?zone=${zone}` : '';
     const res = await fetch(`${API_BASE}/api/heatmap${params}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch heatmap');
-    
+
     const data = await res.json();
     return data.points || [];
   } catch (error) {
     console.error('Heatmap fetch error:', error);
+    return [];
+  }
+}
+
+// Fetch hotspots
+export async function fetchHotspots(zone?: string) {
+  try {
+    const params = zone && zone !== 'all' ? `?zone=${zone}` : '';
+    const res = await fetch(`${API_BASE}/api/hotspots${params}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch hotspots');
+    const data = await res.json();
+    return data.hotspots || [];
+  } catch (error) {
+    console.error('Hotspot fetch error:', error);
     return [];
   }
 }
@@ -170,12 +184,12 @@ export async function createComplaint(complaint: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(complaint),
   });
-  
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.detail || 'Failed to create complaint');
   }
-  
+
   return await res.json();
 }
 
@@ -191,12 +205,12 @@ export async function updateComplaint(complaintNumber: string, updates: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
   });
-  
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.detail || 'Failed to update complaint');
   }
-  
+
   return await res.json();
 }
 
@@ -208,7 +222,7 @@ function formatRelativeTime(dateString: string): string {
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
-  
+
   if (diffMins < 1) return 'Just now';
   if (diffMins < 60) return `${diffMins} mins ago`;
   if (diffHours < 24) return `${diffHours} hours ago`;

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, RefreshCw } from 'lucide-react';
 import { supabase, type HeatmapPoint } from '@/lib/supabase';
 import { useZoneStore } from '@/lib/store';
+import { fetchHeatmapPoints, fetchHotspots } from '@/lib/api';
 
 // Delhi center coordinates
 const DELHI_CENTER: [number, number] = [28.6139, 77.209];
@@ -112,16 +113,16 @@ export function DelhiHeatmap() {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.CircleMarker[]>([]);
+  const clusterMarkersRef = useRef<L.Layer[]>([]); // Ref for cluster markers
   const maskLayerRef = useRef<L.Polygon | null>(null);
   const zoneBorderRef = useRef<L.Polygon | null>(null);
   const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
+  const [hotspots, setHotspots] = useState<any[]>([]); // New state for hotspots
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const { selectedZone } = useZoneStore();
 
-  // Get current zone key
   const currentZone = selectedZone || 'all';
-  const zoneConfig = ZONE_COORDINATES[currentZone] || ZONE_COORDINATES.all;
 
   // Initialize map only once
   useEffect(() => {
@@ -149,7 +150,7 @@ export function DelhiHeatmap() {
     if (!mapRef.current) return;
 
     const config = ZONE_COORDINATES[currentZone] || ZONE_COORDINATES.all;
-    
+
     // Fly to zone
     mapRef.current.flyTo(config.center, config.zoom, {
       duration: 1,
@@ -166,10 +167,10 @@ export function DelhiHeatmap() {
       zoneBorderRef.current = null;
     }
 
-    // Add mask for non-selected zones (only if a specific zone is selected)
-    if (currentZone !== 'all' && ZONE_POLYGONS[currentZone]) {
+    // Add mask for selected zone (including 'all' for whole Delhi)
+    if (ZONE_POLYGONS[currentZone]) {
       const zonePolygon = ZONE_POLYGONS[currentZone];
-      
+
       // Create a large outer boundary (covers entire visible area)
       const outerBounds: [number, number][] = [
         [29.5, 76.0],
@@ -177,18 +178,18 @@ export function DelhiHeatmap() {
         [27.5, 78.0],
         [27.5, 76.0],
       ];
-      
+
       // Create mask polygon with hole (selected zone is the hole)
       // The outer ring goes clockwise, inner ring (hole) goes counter-clockwise
       const maskCoords = [
         outerBounds,
         [...zonePolygon].reverse() as [number, number][], // Reverse to create hole
       ];
-      
+
       maskLayerRef.current = L.polygon(maskCoords, {
         color: 'transparent',
         fillColor: '#1e293b',
-        fillOpacity: 0.5,
+        fillOpacity: 0.8, // Make it darker as requested "in black"
         interactive: false,
       }).addTo(mapRef.current);
 
@@ -212,7 +213,11 @@ export function DelhiHeatmap() {
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // Add new markers
+    // Clear existing cluster markers
+    clusterMarkersRef.current.forEach((layer) => layer.remove());
+    clusterMarkersRef.current = [];
+
+    // Add new heatmap points
     heatmapPoints.slice(0, 200).forEach((point) => {
       const marker = L.circleMarker([point.lat, point.lng], {
         radius: 8 + (point.intensity || 0.5) * 6,
@@ -223,72 +228,87 @@ export function DelhiHeatmap() {
 
       marker.bindPopup(`
         <div class="text-sm">
-          <p class="font-medium">Complaint Cluster</p>
+          <p class="font-medium">Complaint</p>
           <p class="text-slate-500">Intensity: ${Math.round((point.intensity || 0.5) * 100)}%</p>
         </div>
       `);
 
       markersRef.current.push(marker);
     });
-  }, [heatmapPoints]);
+
+    // Add HOTSPOT CLUSTERS
+    hotspots.forEach((hotspot) => {
+      // Create a large, pulsating circle for the hotspot
+      const clusterCircle = L.circle([hotspot.lat, hotspot.lng], {
+        color: '#ef4444',
+        fillColor: '#ef4444',
+        fillOpacity: 0.2,
+        radius: 400, // ~400m radius
+        weight: 2,
+        dashArray: '5, 5'
+      }).addTo(mapRef.current!);
+
+      // Add a text label or icon in center
+      const icon = L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="background-color: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);">${hotspot.complaints}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const centerMarker = L.marker([hotspot.lat, hotspot.lng], { icon }).addTo(mapRef.current!);
+
+      centerMarker.bindPopup(`
+            <div class="p-2">
+                <h3 class="font-bold text-red-600">${hotspot.area} Hotspot</h3>
+                <p class="text-sm font-medium">${hotspot.mainIssue} Issue</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">${hotspot.complaints} Complaints</span>
+                    <span class="text-xs bg-red-100 px-1.5 py-0.5 rounded text-red-600 uppercase font-bold">${hotspot.severity}</span>
+                </div>
+            </div>
+        `);
+
+      clusterMarkersRef.current.push(clusterCircle);
+      clusterMarkersRef.current.push(centerMarker);
+    });
+
+  }, [heatmapPoints, hotspots]);
 
   // Initial data fetch - refetch when zone changes
   useEffect(() => {
     async function fetchInitialData() {
       setIsLoading(true);
-      
+
       try {
-        // Build query with zone filter
-        let query = supabase
-          .from('complaints')
-          .select('latitude, longitude, priority')
-          .not('latitude', 'is', null)
-          .not('longitude', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(500);
+        const [pointsData, hotspotsData] = await Promise.all([
+          fetchHeatmapPoints(currentZone),
+          fetchHotspots(currentZone)
+        ]);
 
-        if (currentZone !== 'all') {
-          query = query.eq('zone', currentZone);
-        }
+        // Backend returns [[lat, lng, intensity], ...], map to object
+        const points: HeatmapPoint[] = pointsData.map((p: any) => ({
+          lat: p[0],
+          lng: p[1],
+          intensity: p[2]
+        }));
+        setHeatmapPoints(points);
+        setHotspots(hotspotsData); // Store hotspots
 
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('Supabase error:', error);
-          // Show empty state instead of mock data
-          setHeatmapPoints([]);
-        } else if (data && data.length > 0) {
-          // Map priority to intensity
-          const priorityIntensity: Record<string, number> = {
-            critical: 1.0,
-            high: 0.8,
-            medium: 0.6,
-            low: 0.4,
-          };
-          
-          const points = data
-            .filter(row => row.latitude && row.longitude)
-            .map((row) => ({
-              lat: row.latitude,
-              lng: row.longitude,
-              intensity: priorityIntensity[row.priority as string] || 0.5,
-            }));
-          setHeatmapPoints(points);
-        } else {
-          // No data - show empty state (no mock data!)
-          setHeatmapPoints([]);
-        }
       } catch (err) {
         console.error('Failed to fetch heatmap data:', err);
         setHeatmapPoints([]);
+        setHotspots([]);
       }
-      
+
       setIsLoading(false);
       setLastUpdate(new Date());
     }
 
     fetchInitialData();
   }, [currentZone]);
+
+
 
   // Realtime subscription - only for real data
   useEffect(() => {
@@ -306,14 +326,48 @@ export function DelhiHeatmap() {
               medium: 0.6,
               low: 0.4,
             };
-            
+
+            const lat = payload.new.latitude;
+            const lng = payload.new.longitude;
+
             const newPoint: HeatmapPoint = {
-              lat: payload.new.latitude,
-              lng: payload.new.longitude,
+              lat: lat,
+              lng: lng,
               intensity: priorityIntensity[payload.new.priority as string] || 0.9,
             };
+
             setHeatmapPoints((prev) => [newPoint, ...prev.slice(0, 499)]);
             setLastUpdate(new Date());
+
+            // Highlight the new complaint on map
+            if (mapRef.current) {
+              // Fly to the new location with high zoom
+              mapRef.current.flyTo([lat, lng], 16, {
+                duration: 2,
+                easeLinearity: 0.25
+              });
+
+              // Create a special pulsing marker/popup
+              const popupContent = `
+                <div class="text-sm p-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-block w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <p class="font-bold text-slate-900">New Complaint!</p>
+                  </div>
+                  <p class="text-slate-600 mb-1">${payload.new.category || 'General Issue'}</p>
+                  <p class="text-xs text-slate-500">${payload.new.location || 'Unknown Location'}</p>
+                </div>
+              `;
+
+              L.popup({
+                closeButton: false,
+                offset: [0, -10],
+                className: 'new-complaint-popup'
+              })
+                .setLatLng([lat, lng])
+                .setContent(popupContent)
+                .openOn(mapRef.current);
+            }
           }
         }
       )
@@ -342,7 +396,7 @@ export function DelhiHeatmap() {
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-0">
         <div className="h-[320px] w-full relative">
           {isLoading && (
@@ -353,12 +407,12 @@ export function DelhiHeatmap() {
               </div>
             </div>
           )}
-          
-          <div 
-            ref={mapContainerRef} 
+
+          <div
+            ref={mapContainerRef}
             className="h-full w-full z-10"
           />
-          
+
           {/* Compact Legend Overlay */}
           {!isLoading && (
             <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-sm z-30">
