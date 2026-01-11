@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import 'leaflet/dist/leaflet.css'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { Toaster } from '@/components/ui/toaster'
 

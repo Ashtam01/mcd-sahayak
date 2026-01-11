@@ -1,0 +1,125 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1025, 28.7041]
+      },
+      "properties": {
+        "id": "C001",
+        "category": "Garbage",
+        "status": "Open",
+        "description": "Large garbage dump blocking road",
+        "ward": "Rohini",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2090, 28.6139]
+      },
+      "properties": {
+        "id": "C002",
+        "category": "Sewage",
+        "status": "Open",
+        "description": "Sewage overflow in residential area",
+        "ward": "Central Delhi",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0850, 28.5355]
+      },
+      "properties": {
+        "id": "C003",
+        "category": "Water Supply",
+        "status": "Open",
+        "description": "No water supply for 3 days",
+        "ward": "Dwarka",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2180, 28.6280]
+      },
+      "properties": {
+        "id": "C004",
+        "category": "Garbage",
+        "status": "Open",
+        "description": "Open manhole on main road",
+        "ward": "Shahdara",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1750, 28.5245]
+      },
+      "properties": {
+        "id": "C005",
+        "category": "Sewage",
+        "status": "Open",
+        "description": "Sewage pipeline burst",
+        "ward": "South Delhi",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2950, 28.6517]
+      },
+      "properties": {
+        "id": "C006",
+        "category": "Water Supply",
+        "status": "Open",
+        "description": "Water contamination reported",
+        "ward": "East Delhi",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0460, 28.7500]
+      },
+      "properties": {
+        "id": "C007",
+        "category": "Garbage",
+        "status": "Open",
+        "description": "Illegal dumping site",
+        "ward": "North Delhi",
+        "priority": "critical"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1167, 28.6328]
+      },
+      "properties": {
+        "id": "C008",
+        "category": "Sewage",
+        "status": "Open",
+        "description": "Sewage backup in multiple houses",
+        "ward": "New Delhi",
+        "priority": "critical"
+      }
+    }
+  ]
+}

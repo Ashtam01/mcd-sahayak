@@ -31,9 +31,11 @@ import { RealtimeHeatmap } from '@/components/dashboard/RealtimeHeatmap';
 import VoiceAgent from '@/app/components/VoiceAgent';
 import { useZoneStore, ZONES, useSidebarStore } from '@/lib/store';
 import { fetchDashboardStats, fetchRecentActivity, type DashboardStats, type Activity as ActivityType } from '@/lib/api';
-import { supabase } from '@/lib/supabase';
+import { supabase, type Complaint } from '@/lib/supabase';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
 
 // Enhanced KPI Card with animation
 interface KPICardProps {
@@ -416,6 +418,8 @@ export default function DashboardPage() {
   const { selectedZone } = useZoneStore();
   const { isCollapsed } = useSidebarStore();
   const t = useTranslation();
+  const router = useRouter();
+  const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -707,9 +711,18 @@ export default function DashboardPage() {
 
         {/* Right: Map + Activity - Takes 2 columns (40%) - SECONDARY */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Compact Map */}
+          {/* Compact Map - Digital Ward 3D */}
           <div className="relative">
-            <RealtimeHeatmap />
+            <RealtimeHeatmap 
+              onComplaintSelect={(complaint: Complaint) => {
+                toast({
+                  title: t.complaints.title,
+                  description: `${complaint.category} - ${complaint.location}`,
+                });
+                // Navigate to complaints page with the selected complaint
+                router.push(`/complaints?complaint=${complaint.id}`);
+              }}
+            />
           </div>
           
           {/* Recent Activity - Compact */}

@@ -1,0 +1,79 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.15, 28.75],
+          [77.18, 28.72],
+          [77.20, 28.70],
+          [77.22, 28.68],
+          [77.24, 28.66],
+          [77.26, 28.64],
+          [77.28, 28.62],
+          [77.30, 28.60],
+          [77.32, 28.58],
+          [77.34, 28.56],
+          [77.36, 28.54]
+        ]
+      },
+      "properties": {
+        "name": "Yamuna River",
+        "type": "river"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.085, 28.535],
+          [77.090, 28.535],
+          [77.090, 28.540],
+          [77.085, 28.540],
+          [77.085, 28.535]
+        ]]
+      },
+      "properties": {
+        "name": "Sanjay Lake",
+        "type": "lake"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.040, 28.600],
+          [77.050, 28.600],
+          [77.050, 28.610],
+          [77.040, 28.610],
+          [77.040, 28.600]
+        ]]
+      },
+      "properties": {
+        "name": "Najafgarh Jheel",
+        "type": "lake"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [77.200, 28.620],
+          [77.205, 28.620],
+          [77.205, 28.625],
+          [77.200, 28.625],
+          [77.200, 28.620]
+        ]]
+      },
+      "properties": {
+        "name": "Hauz Khas Lake",
+        "type": "lake"
+      }
+    }
+  ]
+}

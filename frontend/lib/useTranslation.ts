@@ -7,13 +7,21 @@ import { t, getLanguage, type Translations } from './i18n';
 
 export function useTranslation(): Translations {
   const { language } = useLanguageStore();
-  const [translations, setTranslations] = useState<Translations>(t());
+  const [translations, setTranslations] = useState<Translations>(() => {
+    // Initialize with current language from i18n (handles SSR/hydration)
+    if (typeof window !== 'undefined') {
+      return t();
+    }
+    // Fallback for SSR
+    const currentLang = getLanguage();
+    return t();
+  });
 
   useEffect(() => {
-    // Update translations when language changes
+    // Update translations when language changes in store
     setTranslations(t());
     
-    // Listen for language change events
+    // Also listen for language change events (from i18n module)
     const handleLanguageChange = () => {
       setTranslations(t());
     };

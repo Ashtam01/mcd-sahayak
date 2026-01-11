@@ -7,6 +7,7 @@ import {
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from '@/lib/useTranslation';
 
 // --- Types ---
 interface Scheme {
@@ -40,6 +41,8 @@ const ACTIVE_SCHEMES: Scheme[] = [
 ];
 
 export default function SchemesPage() {
+  const t = useTranslation();
+  
   return (
     <div className="flex flex-col space-y-6 max-w-[1600px] mx-auto p-2 min-h-[calc(100vh-2rem)]">
       
@@ -48,9 +51,9 @@ export default function SchemesPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-blue-600" />
-            Active Schemes Registry
+            {t.schemes.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Manage public welfare schemes available to citizens</p>
+          <p className="text-sm text-slate-500 mt-1">{t.schemes.subtitle}</p>
         </div>
       </div>
 
@@ -60,9 +63,9 @@ export default function SchemesPage() {
           <div className="flex gap-4">
               <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                  <Input placeholder="Search schemes by name or category..." className="pl-9 bg-white" />
+                  <Input placeholder={t.schemes.searchPlaceholder} className="pl-9 bg-white" />
               </div>
-              <Button className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" /> Register New Scheme</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" /> {t.schemes.registerNew}</Button>
           </div>
 
           {/* Scheme Grid */}
@@ -76,7 +79,7 @@ export default function SchemesPage() {
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
                               scheme.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                           }`}>
-                              {scheme.status}
+                              {scheme.status === 'active' ? t.schemes.active : t.schemes.paused}
                           </span>
                       </CardHeader>
                       <CardContent className="pt-4">
@@ -85,13 +88,13 @@ export default function SchemesPage() {
                           
                           <div className="grid grid-cols-2 gap-2 mb-4">
                               <div className="bg-slate-50 p-2 rounded-md">
-                                  <p className="text-[10px] text-slate-400 uppercase font-bold">Beneficiaries</p>
+                                  <p className="text-[10px] text-slate-400 uppercase font-bold">{t.schemes.beneficiaries}</p>
                                   <p className="text-sm font-semibold text-slate-700 flex items-center gap-1">
                                       <Users className="w-3 h-3" /> {scheme.beneficiaries}
                                   </p>
                               </div>
                               <div className="bg-slate-50 p-2 rounded-md">
-                                  <p className="text-[10px] text-slate-400 uppercase font-bold">Grant/Benefit</p>
+                                  <p className="text-[10px] text-slate-400 uppercase font-bold">{t.schemes.grantBenefit}</p>
                                   <p className="text-sm font-semibold text-slate-700 flex items-center gap-1">
                                       <Coins className="w-3 h-3" /> {scheme.grant}
                                   </p>
@@ -107,7 +110,7 @@ export default function SchemesPage() {
                           </div>
 
                           <Button variant="outline" className="w-full group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200">
-                              View Details <ExternalLink className="w-4 h-4 ml-2" />
+                              {t.schemes.viewDetails} <ExternalLink className="w-4 h-4 ml-2" />
                           </Button>
                       </CardContent>
                   </Card>

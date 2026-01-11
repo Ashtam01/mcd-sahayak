@@ -1,0 +1,155 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2066, 28.5245]
+      },
+      "properties": {
+        "id": "M001",
+        "category": "Potholes",
+        "status": "Open",
+        "description": "Multiple potholes on main road",
+        "ward": "South Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2197, 28.6328]
+      },
+      "properties": {
+        "id": "M002",
+        "category": "Streetlights",
+        "status": "Open",
+        "description": "Non-functional streetlights",
+        "ward": "Central Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1025, 28.7041]
+      },
+      "properties": {
+        "id": "M003",
+        "category": "Stray Dogs",
+        "status": "Open",
+        "description": "Stray dog menace in park",
+        "ward": "Rohini",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0850, 28.5355]
+      },
+      "properties": {
+        "id": "M004",
+        "category": "Potholes",
+        "status": "Open",
+        "description": "Road repair needed",
+        "ward": "Dwarka",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2180, 28.6280]
+      },
+      "properties": {
+        "id": "M005",
+        "category": "Streetlights",
+        "status": "Open",
+        "description": "Dim streetlights",
+        "ward": "Shahdara",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1750, 28.5245]
+      },
+      "properties": {
+        "id": "M006",
+        "category": "Potholes",
+        "status": "Open",
+        "description": "Pothole causing traffic issues",
+        "ward": "South Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2950, 28.6517]
+      },
+      "properties": {
+        "id": "M007",
+        "category": "Streetlights",
+        "status": "Open",
+        "description": "Broken streetlight pole",
+        "ward": "East Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0460, 28.7500]
+      },
+      "properties": {
+        "id": "M008",
+        "category": "Stray Dogs",
+        "status": "Open",
+        "description": "Stray dogs in residential area",
+        "ward": "North Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1167, 28.6328]
+      },
+      "properties": {
+        "id": "M009",
+        "category": "Potholes",
+        "status": "Open",
+        "description": "Road damage near intersection",
+        "ward": "New Delhi",
+        "priority": "moderate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1900, 28.6000]
+      },
+      "properties": {
+        "id": "M010",
+        "category": "Streetlights",
+        "status": "Open",
+        "description": "Flickering streetlights",
+        "ward": "Central Delhi",
+        "priority": "moderate"
+      }
+    }
+  ]
+}

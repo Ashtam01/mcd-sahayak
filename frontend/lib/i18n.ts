@@ -33,6 +33,7 @@ interface Translations {
     complaints: string;
     analytics: string;
     heatmap: string;
+    delhi3d: string;
     broadcast: string;
     schemes: string;
     benefitsRegistry: string;
@@ -193,6 +194,49 @@ interface Translations {
     searchPlaceholder: string;
     notifications: string;
   };
+
+  // Schemes
+  schemes: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    registerNew: string;
+    beneficiaries: string;
+    grantBenefit: string;
+    viewDetails: string;
+    active: string;
+    paused: string;
+  };
+
+  // Analytics
+  analytics: {
+    title: string;
+    subtitle: string;
+  };
+
+  // Heatmap
+  heatmap: {
+    title: string;
+    subtitle: string;
+  };
+
+  // Broadcast
+  broadcast: {
+    title: string;
+    subtitle: string;
+  };
+
+  // Benefits
+  benefits: {
+    title: string;
+    subtitle: string;
+  };
+
+  // Settings
+  settings: {
+    title: string;
+    subtitle: string;
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -223,6 +267,7 @@ const translations: Record<Language, Translations> = {
       complaints: 'Complaints',
       analytics: 'Analytics',
       heatmap: 'Heatmap',
+      delhi3d: 'Delhi 3D Map',
       broadcast: 'Broadcast',
       schemes: 'Schemes',
       benefitsRegistry: 'Benefits Registry',
@@ -371,6 +416,37 @@ const translations: Record<Language, Translations> = {
       searchPlaceholder: 'Search complaints, tickets, citizens...',
       notifications: 'Notifications',
     },
+    schemes: {
+      title: 'Active Schemes Registry',
+      subtitle: 'Manage public welfare schemes available to citizens',
+      searchPlaceholder: 'Search schemes by name or category...',
+      registerNew: 'Register New Scheme',
+      beneficiaries: 'Beneficiaries',
+      grantBenefit: 'Grant/Benefit',
+      viewDetails: 'View Details',
+      active: 'Active',
+      paused: 'Paused',
+    },
+    analytics: {
+      title: 'Analytics Dashboard',
+      subtitle: 'Comprehensive insights and data visualization',
+    },
+    heatmap: {
+      title: 'Geographic Heatmap',
+      subtitle: 'Visualize complaint distribution across zones',
+    },
+    broadcast: {
+      title: 'Broadcast Messages',
+      subtitle: 'Send announcements and updates to citizens',
+    },
+    benefits: {
+      title: 'Benefits Registry',
+      subtitle: 'Manage citizen benefits and entitlements',
+    },
+    settings: {
+      title: 'Settings',
+      subtitle: 'Configure system preferences and options',
+    },
   },
   hi: {
     common: {
@@ -399,6 +475,7 @@ const translations: Record<Language, Translations> = {
       complaints: 'शिकायतें',
       analytics: 'विश्लेषण',
       heatmap: 'हीटमैप',
+      delhi3d: 'दिल्ली 3D मानचित्र',
       broadcast: 'प्रसारण',
       schemes: 'योजनाएं',
       benefitsRegistry: 'लाभ रजिस्ट्री',
@@ -546,6 +623,37 @@ const translations: Record<Language, Translations> = {
       selectZone: 'ज़ोन चुनें',
       searchPlaceholder: 'शिकायतें, टिकट, नागरिक खोजें...',
       notifications: 'सूचनाएं',
+    },
+    schemes: {
+      title: 'सक्रिय योजना रजिस्ट्री',
+      subtitle: 'नागरिकों के लिए उपलब्ध सार्वजनिक कल्याण योजनाओं को प्रबंधित करें',
+      searchPlaceholder: 'नाम या श्रेणी से योजनाएं खोजें...',
+      registerNew: 'नई योजना पंजीकृत करें',
+      beneficiaries: 'लाभार्थी',
+      grantBenefit: 'अनुदान/लाभ',
+      viewDetails: 'विवरण देखें',
+      active: 'सक्रिय',
+      paused: 'रोका गया',
+    },
+    analytics: {
+      title: 'विश्लेषण डैशबोर्ड',
+      subtitle: 'व्यापक अंतर्दृष्टि और डेटा विज़ुअलाइज़ेशन',
+    },
+    heatmap: {
+      title: 'भौगोलिक हीटमैप',
+      subtitle: 'ज़ोन में शिकायत वितरण की कल्पना करें',
+    },
+    broadcast: {
+      title: 'प्रसारण संदेश',
+      subtitle: 'नागरिकों को घोषणाएं और अपडेट भेजें',
+    },
+    benefits: {
+      title: 'लाभ रजिस्ट्री',
+      subtitle: 'नागरिक लाभ और अधिकारों को प्रबंधित करें',
+    },
+    settings: {
+      title: 'सेटिंग्स',
+      subtitle: 'सिस्टम प्राथमिकताएं और विकल्प कॉन्फ़िगर करें',
     },
   },
 };

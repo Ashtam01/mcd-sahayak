@@ -1,35 +1,28 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, RefreshCw } from 'lucide-react';
+import { type Complaint } from '@/lib/supabase';
 
-// Dynamically import the map component with no SSR
-const DelhiHeatmap = dynamic(
-  () => import('./DelhiHeatmap').then((mod) => mod.DelhiHeatmap),
+// Dynamically import the Delhi Map component with no SSR
+const DelhiMap = dynamic(
+  () => import('./DelhiMap').then((mod) => mod.DelhiMap),
   {
     ssr: false,
     loading: () => (
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-blue-600" />
-            <CardTitle className="text-lg">Real-Time Complaint Heatmap</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="h-[320px] w-full flex items-center justify-center bg-slate-50">
-            <div className="text-center">
-              <RefreshCw className="w-6 h-6 text-blue-600 animate-spin mx-auto mb-2" />
-              <p className="text-xs text-slate-600">Loading map...</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="h-[400px] w-full flex items-center justify-center bg-slate-50 rounded-xl border border-slate-200">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-sm text-slate-600">Loading Delhi map...</p>
+        </div>
+      </div>
     ),
   }
 );
 
-export function RealtimeHeatmap() {
-  return <DelhiHeatmap />;
+interface RealtimeHeatmapProps {
+  onComplaintSelect?: (complaint: Complaint) => void;
+}
+
+export function RealtimeHeatmap({ onComplaintSelect }: RealtimeHeatmapProps = {}) {
+  return <DelhiMap onComplaintSelect={onComplaintSelect} />;
 }

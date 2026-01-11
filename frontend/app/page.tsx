@@ -18,9 +18,12 @@ import {
   Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LanguageToggle } from '@/components/ui/language-toggle';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function LandingPage() {
   const router = useRouter();
+  const t = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,15 +48,16 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageToggle />
               <Button
                 variant="ghost"
                 onClick={() => router.push('/login')}
                 className="text-slate-600 hover:text-slate-900"
               >
-                Sign In
+                {t.login.signIn}
               </Button>
               <Button onClick={() => router.push('/login')} className="shadow-md">
-                Get Started
+                {t.landing.getStarted}
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
@@ -71,13 +75,12 @@ export default function LandingPage() {
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
-              Connecting Citizens with
-              <span className="block gradient-text mt-2">Municipal Services</span>
+              {t.landing.title.split(' with ')[0]}
+              <span className="block gradient-text mt-2">{t.landing.title.split(' with ')[1] || 'Municipal Services'}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Streamline complaint resolution with intelligent automation, 
-              real-time tracking, and data-driven insights for the Municipal Corporation of Delhi.
+              {t.landing.subtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -86,7 +89,7 @@ export default function LandingPage() {
                 onClick={() => router.push('/login')}
                 className="text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all hover-lift"
               >
-                Access Admin Panel
+                {t.landing.getStarted}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
@@ -95,7 +98,7 @@ export default function LandingPage() {
                 className="text-lg px-8 py-6 border-2"
               >
                 <Phone className="w-5 h-5 mr-2" />
-                Call 311
+                {t.landing.call311}
               </Button>
             </div>
 
@@ -103,19 +106,19 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl font-bold text-blue-600 mb-1">98%</div>
-                <div className="text-sm text-slate-600">Resolution Rate</div>
+                <div className="text-sm text-slate-600">{t.landing.stats.resolutionRate}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-emerald-600 mb-1">24h</div>
-                <div className="text-sm text-slate-600">Avg Response</div>
+                <div className="text-sm text-slate-600">{t.landing.stats.avgResponse}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600 mb-1">15L+</div>
-                <div className="text-sm text-slate-600">Citizens Served</div>
+                <div className="text-sm text-slate-600">{t.landing.stats.citizensServed}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-amber-600 mb-1">7/24</div>
-                <div className="text-sm text-slate-600">Available</div>
+                <div className="text-sm text-slate-600">{t.landing.stats.available}</div>
               </div>
             </div>
           </div>
@@ -127,10 +130,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Powerful Features for Modern Governance
+              {t.landing.features.title}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Everything you need to manage civic complaints efficiently and transparently
+              {t.landing.features.subtitle}
             </p>
           </div>
 
@@ -138,38 +141,38 @@ export default function LandingPage() {
             {[
               {
                 icon: Phone,
-                title: 'Voice-First Interface',
-                description: 'AI-powered voice agent handles complaints in Hindi and English, making civic services accessible to all.',
+                title: t.landing.features.voiceFirst.title,
+                description: t.landing.features.voiceFirst.description,
                 color: 'blue',
               },
               {
                 icon: BarChart3,
-                title: 'Real-Time Analytics',
-                description: 'Comprehensive dashboards with live metrics, trends, and insights to drive data-driven decisions.',
+                title: t.landing.features.analytics.title,
+                description: t.landing.features.analytics.description,
                 color: 'emerald',
               },
               {
                 icon: MapPin,
-                title: 'Geographic Intelligence',
-                description: 'Interactive heatmaps and zone-based analytics to identify patterns and optimize resource allocation.',
+                title: t.landing.features.geographic.title,
+                description: t.landing.features.geographic.description,
                 color: 'purple',
               },
               {
                 icon: Zap,
-                title: 'AI-Powered Automation',
-                description: 'Intelligent routing, sentiment analysis, and automated responses reduce manual workload by 60%.',
+                title: t.landing.features.automation.title,
+                description: t.landing.features.automation.description,
                 color: 'amber',
               },
               {
                 icon: Clock,
-                title: 'SLA Management',
-                description: 'Automated tracking and alerts ensure timely resolution within defined service level agreements.',
+                title: t.landing.features.sla.title,
+                description: t.landing.features.sla.description,
                 color: 'red',
               },
               {
                 icon: Users,
-                title: 'Multi-Channel Support',
-                description: 'Unified platform for voice, SMS, WhatsApp, and web complaints with seamless integration.',
+                title: t.landing.features.multichannel.title,
+                description: t.landing.features.multichannel.description,
                 color: 'indigo',
               },
             ].map((feature, index) => (
@@ -197,10 +200,10 @@ export default function LandingPage() {
       <section className="py-20 px-6 lg:px-8 bg-gradient-government text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Transform Civic Services?
+            {t.landing.cta.title}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join the Municipal Corporation of Delhi in building a more responsive and efficient government.
+            {t.landing.cta.subtitle}
           </p>
           <Button
             size="lg"
@@ -208,7 +211,7 @@ export default function LandingPage() {
             onClick={() => router.push('/login')}
             className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-blue-50 shadow-xl"
           >
-            Get Started Now
+            {t.landing.cta.button}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </div>
@@ -235,10 +238,10 @@ export default function LandingPage() {
             <div>
               <h4 className="text-white font-semibold mb-4">Platform</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                <li><Link href="/complaints" className="hover:text-white transition-colors">Complaints</Link></li>
-                <li><Link href="/analytics" className="hover:text-white transition-colors">Analytics</Link></li>
-                <li><Link href="/heatmap" className="hover:text-white transition-colors">Heatmap</Link></li>
+                <li><Link href="/dashboard" className="hover:text-white transition-colors">{t.nav.dashboard}</Link></li>
+                <li><Link href="/complaints" className="hover:text-white transition-colors">{t.nav.complaints}</Link></li>
+                <li><Link href="/analytics" className="hover:text-white transition-colors">{t.nav.analytics}</Link></li>
+                <li><Link href="/heatmap" className="hover:text-white transition-colors">{t.nav.heatmap}</Link></li>
               </ul>
             </div>
             <div>

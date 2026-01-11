@@ -8,21 +8,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useZoneStore, ZONES, useLanguageStore } from '@/lib/store';
+import { useZoneStore, ZONES } from '@/lib/store';
 import { useTranslation } from '@/lib/useTranslation';
 import { Input } from '@/components/ui/input';
+import { LanguageToggle } from '@/components/ui/language-toggle';
 
 export function TopBar() {
   const { selectedZone, setSelectedZone } = useZoneStore();
-  const { language, setLanguage } = useLanguageStore();
   const t = useTranslation();
 
   const handleZoneChange = (value: string) => {
     setSelectedZone(value === 'all' ? null : value);
-  };
-
-  const handleLanguageChange = (lang: 'en' | 'hi') => {
-    setLanguage(lang);
   };
 
   return (
@@ -94,28 +90,7 @@ export function TopBar() {
           </button>
 
           {/* Language Toggle */}
-          <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 border border-slate-200 shadow-sm">
-            <button
-              onClick={() => handleLanguageChange('en')}
-              className={`px-3 py-1.5 text-sm font-semibold rounded-md shadow-sm transition-all ${
-                language === 'en'
-                  ? 'text-white bg-blue-600 hover:bg-blue-700'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-            >
-              ENG
-            </button>
-            <button
-              onClick={() => handleLanguageChange('hi')}
-              className={`px-3 py-1.5 text-sm font-semibold rounded-md shadow-sm transition-all ${
-                language === 'hi'
-                  ? 'text-white bg-blue-600 hover:bg-blue-700'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-              }`}
-            >
-              हिं
-            </button>
-          </div>
+          <LanguageToggle />
         </div>
       </div>
     </header>

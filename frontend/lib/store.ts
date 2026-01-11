@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getLanguage, setLanguage, type Language } from './i18n';
+import { getLanguage, setLanguage as setI18nLanguage, type Language } from './i18n';
 
 interface ZoneState {
   selectedZone: string | null;
@@ -43,8 +43,8 @@ export const useLanguageStore = create<LanguageState>()(
     (set) => ({
       language: getLanguage(),
       setLanguage: (lang) => {
-        setLanguage(lang);
-        set({ language: lang });
+        setI18nLanguage(lang); // Update i18n module
+        set({ language: lang }); // Update Zustand store
       },
     }),
     {

@@ -17,6 +17,7 @@ import {
   Shield,
   Users,
   FileText,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/lib/store';
@@ -87,6 +88,7 @@ const mainNavItems = [
   { nameKey: 'nav.complaints', href: '/complaints', icon: Mail },
   { nameKey: 'nav.analytics', href: '/analytics', icon: BarChart3 },
   { nameKey: 'nav.heatmap', href: '/heatmap', icon: Map },
+  { nameKey: 'nav.delhi3d', href: '/delhi-3d', icon: Layers },
 ];
 
 // Schemes block items

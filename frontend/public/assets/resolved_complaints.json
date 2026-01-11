@@ -1,0 +1,125 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2000, 28.6200]
+      },
+      "properties": {
+        "id": "R001",
+        "category": "Garbage",
+        "status": "Resolved",
+        "description": "Garbage cleared",
+        "ward": "Central Delhi",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1000, 28.7000]
+      },
+      "properties": {
+        "id": "R002",
+        "category": "Potholes",
+        "status": "Resolved",
+        "description": "Road repaired",
+        "ward": "Rohini",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0800, 28.5300]
+      },
+      "properties": {
+        "id": "R003",
+        "category": "Streetlights",
+        "status": "Resolved",
+        "description": "Streetlight fixed",
+        "ward": "Dwarka",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2200, 28.6300]
+      },
+      "properties": {
+        "id": "R004",
+        "category": "Water Supply",
+        "status": "Resolved",
+        "description": "Water supply restored",
+        "ward": "Shahdara",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1700, 28.5200]
+      },
+      "properties": {
+        "id": "R005",
+        "category": "Sewage",
+        "status": "Resolved",
+        "description": "Sewage issue resolved",
+        "ward": "South Delhi",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.2900, 28.6500]
+      },
+      "properties": {
+        "id": "R006",
+        "category": "Garbage",
+        "status": "Resolved",
+        "description": "Garbage collection completed",
+        "ward": "East Delhi",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.0400, 28.7450]
+      },
+      "properties": {
+        "id": "R007",
+        "category": "Potholes",
+        "status": "Resolved",
+        "description": "Road patched",
+        "ward": "North Delhi",
+        "priority": "resolved"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [77.1100, 28.6300]
+      },
+      "properties": {
+        "id": "R008",
+        "category": "Streetlights",
+        "status": "Resolved",
+        "description": "Streetlight replaced",
+        "ward": "New Delhi",
+        "priority": "resolved"
+      }
+    }
+  ]
+}

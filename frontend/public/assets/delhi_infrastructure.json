@@ -1,0 +1,124 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.085, 28.535],
+          [77.100, 28.545],
+          [77.115, 28.555],
+          [77.130, 28.565],
+          [77.145, 28.575],
+          [77.160, 28.585],
+          [77.175, 28.595],
+          [77.190, 28.605],
+          [77.205, 28.615],
+          [77.220, 28.625]
+        ]
+      },
+      "properties": {
+        "name": "Blue Line",
+        "type": "metro",
+        "color": "#0066CC"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.200, 28.620],
+          [77.195, 28.630],
+          [77.190, 28.640],
+          [77.185, 28.650],
+          [77.180, 28.660],
+          [77.175, 28.670],
+          [77.170, 28.680]
+        ]
+      },
+      "properties": {
+        "name": "Yellow Line",
+        "type": "metro",
+        "color": "#FFD700"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.100, 28.700],
+          [77.110, 28.690],
+          [77.120, 28.680],
+          [77.130, 28.670],
+          [77.140, 28.660],
+          [77.150, 28.650],
+          [77.160, 28.640]
+        ]
+      },
+      "properties": {
+        "name": "Red Line",
+        "type": "metro",
+        "color": "#DC143C"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.040, 28.750],
+          [77.050, 28.740],
+          [77.060, 28.730],
+          [77.070, 28.720],
+          [77.080, 28.710],
+          [77.090, 28.700]
+        ]
+      },
+      "properties": {
+        "name": "Green Line",
+        "type": "metro",
+        "color": "#228B22"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.220, 28.630],
+          [77.230, 28.640],
+          [77.240, 28.650],
+          [77.250, 28.660],
+          [77.260, 28.670]
+        ]
+      },
+      "properties": {
+        "name": "Violet Line",
+        "type": "metro",
+        "color": "#8B00FF"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [76.900, 28.600],
+          [76.950, 28.610],
+          [77.000, 28.620],
+          [77.050, 28.630],
+          [77.100, 28.640],
+          [77.150, 28.650]
+        ]
+      },
+      "properties": {
+        "name": "NH-8 (Highway)",
+        "type": "highway",
+        "color": "#FF8C00"
+      }
+    }
+  ]
+}

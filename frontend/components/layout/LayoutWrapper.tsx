@@ -6,8 +6,8 @@ import { TopBar } from './TopBar';
 import { useSidebarStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
-// Pages that don't need the dashboard layout
-const noLayoutPaths = ['/login'];
+// Pages that don't need the dashboard layout (public pages and full-screen features)
+const noLayoutPaths = ['/', '/login', '/delhi-3d'];
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
