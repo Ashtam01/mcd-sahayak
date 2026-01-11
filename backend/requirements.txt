@@ -6,3 +6,4 @@ pydantic
 sentence-transformers
 pypdf
 httpx
+python-multipart
