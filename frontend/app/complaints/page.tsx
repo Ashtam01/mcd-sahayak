@@ -5,7 +5,7 @@ import {
   Trash2, Droplets, Lightbulb, Construction, Bug, TreeDeciduous,
   Play, Pause, Volume2, UserCheck, CheckCircle2, MessageCircle,
   MapPin, Clock, Phone, User, FileText, Filter, RefreshCw,
-  Headphones, MessageSquare, Loader2, X, AlertTriangle, 
+  Headphones, MessageSquare, Loader2, X, AlertTriangle,
   ArrowRight, Activity, Calendar
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import { supabase, type Complaint } from '@/lib/supabase';
 import { useZoneStore } from '@/lib/store';
 import { useToast } from '@/components/ui/use-toast';
 import { useTranslation } from '@/lib/useTranslation';
+import { fetchComplaints, updateComplaint } from '@/lib/api';
 // IMPORT THE NEW COMPONENT
 import AIAnalysisPanel from '@/components/complaints/AIAnalysisPanel';
 
@@ -33,7 +34,7 @@ interface ComplaintWithCall extends Complaint {
 
 // --- Constants & Config ---
 const CATEGORIES = [
-  'Garbage', 'Water', 'Street Light', 'Road', 
+  'Garbage', 'Water', 'Street Light', 'Road',
   'Pest Control', 'Sewage', 'Trees', 'Others'
 ];
 
@@ -63,7 +64,7 @@ function getStatusStyle(status: string) {
 function formatTime(dateString: string) {
   const date = new Date(dateString);
   const now = new Date();
-  const diff = (now.getTime() - date.getTime()) / 1000; 
+  const diff = (now.getTime() - date.getTime()) / 1000;
   if (diff < 60) return 'Just now';
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
@@ -93,31 +94,28 @@ export default function ComplaintsPage() {
   const t = useTranslation();
 
   useEffect(() => {
-    async function fetchComplaints() {
+    async function loadComplaints() {
       setIsLoading(true);
       try {
-        let query = supabase.from('complaints').select('*').order('created_at', { ascending: false }).limit(100);
-        const zoneToFilter = regionFilter !== 'all' ? regionFilter : selectedZone;
-        if (zoneToFilter && zoneToFilter !== 'all') query = query.eq('zone', zoneToFilter);
-        if (categoryFilter !== 'all') query = query.eq('category', categoryFilter);
-        if (statusFilter !== 'all') {
-            const map: any = { open: 'Open', 'in-progress': 'In Progress', resolved: 'Resolved', escalated: 'Escalated' };
-            query = query.eq('status', map[statusFilter] || statusFilter);
-        }
-        const { data, error } = await query;
-        if (error) throw error;
-        if (data) {
-          const mapped = data.map((c: any) => ({
-            ...c, id: c.complaint_number || c.id, status: (c.status || 'Open').toLowerCase().replace(' ', '-'),
-            priority: c.priority || 'medium', title: c.title || `${c.category} Report @ ${c.location?.split(',')[0]}`,
-            _rawId: c.id
-          }));
-          setComplaints(mapped);
-          if (mapped.length > 0 && !selectedComplaint) handleSelectComplaint(mapped[0]);
-        }
+        const data = await fetchComplaints({
+          zone: regionFilter,
+          status: statusFilter,
+          limit: 100
+        });
+
+        const mapped = data.map((c: any) => ({
+          ...c,
+          id: c.complaint_number || c.id,
+          status: (c.status || 'Open').toLowerCase().replace(' ', '-'),
+          priority: c.priority || 'medium',
+          title: c.title || `${c.category} Report @ ${c.location?.split(',')[0]}`,
+          _rawId: c.id
+        })) as any[];
+        setComplaints(mapped);
+        if (mapped.length > 0 && !selectedComplaint) handleSelectComplaint(mapped[0]);
       } catch (err) { console.error('Fetch error:', err); } finally { setIsLoading(false); }
     }
-    fetchComplaints();
+    loadComplaints();
   }, [selectedZone, statusFilter, categoryFilter, regionFilter]);
 
   const handleSelectComplaint = async (complaint: ComplaintWithCall) => {
@@ -137,17 +135,33 @@ export default function ComplaintsPage() {
   const updateStatus = async (status: string, assignedTo?: string) => {
     if (!selectedComplaint) return;
     try {
-        await supabase.from('complaints').update({ status: status === 'in-progress' ? 'In Progress' : 'Resolved', assigned_to: assignedTo, resolved_at: status === 'resolved' ? new Date().toISOString() : null }).eq('id', selectedComplaint._rawId);
-        setComplaints(prev => prev.map(c => c.id === selectedComplaint.id ? { ...c, status: status, assigned_to: assignedTo || c.assigned_to } : c));
-        setSelectedComplaint(prev => prev ? ({ ...prev, status: status, assigned_to: assignedTo || prev.assigned_to }) : null);
-        toast({ 
-          title: t.common.success, 
-          description: status === 'resolved' ? t.complaints.markedResolved : t.complaints.assignedSuccessfully
-        });
-    } catch (e) { toast({ title: t.complaints.updateFailed, variant: 'destructive' }); }
+      // Using API abstraction from Main branch
+      await updateComplaint(selectedComplaint._rawId || selectedComplaint.id, {
+        status: status,
+        assigned_to: assignedTo
+      });
+
+      // Update local state for immediate UI feedback
+      const displayStatus = status === 'in-progress' ? 'In Progress' : status === 'resolved' ? 'Resolved' : status;
+
+      setComplaints(prev => prev.map(c => c.id === selectedComplaint.id ? { ...c, status: displayStatus.toLowerCase().replace(' ', '-'), assigned_to: assignedTo || c.assigned_to } as any : c));
+      setSelectedComplaint(prev => prev ? ({ ...prev, status: displayStatus.toLowerCase().replace(' ', '-'), assigned_to: assignedTo || prev.assigned_to } as any) : null);
+
+      // Using Translation from City-Intelligence-Layer branch
+      toast({ 
+        title: t.common.success, 
+        description: status === 'resolved' ? t.complaints.markedResolved : t.complaints.assignedSuccessfully 
+      });
+    } catch (e) {
+      console.error(e);
+      toast({ title: t.complaints.updateFailed, variant: 'destructive' });
+    }
   };
 
-  const filtered = complaints.filter(c => searchQuery === '' || JSON.stringify(c).toLowerCase().includes(searchQuery.toLowerCase()));
+  const filtered = complaints.filter(c =>
+    (searchQuery === '' || JSON.stringify(c).toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (categoryFilter === 'all' || c.category === categoryFilter)
+  );
   const getCatConfig = (cat: string) => categoryConfig[cat] || categoryConfig['Others'];
 
   return (
@@ -188,33 +202,33 @@ export default function ComplaintsPage() {
            </div>
            <div className="flex-1 overflow-y-auto custom-scrollbar">
               {isLoading ? <div className="flex justify-center p-8"><Loader2 className="animate-spin text-slate-400" /></div> : filtered.length === 0 ? <div className="text-center p-8 text-slate-400 text-sm">{t.complaints.noComplaints}</div> : filtered.map(c => {
-                    const config = getCatConfig(c.category);
-                    const Icon = config.icon;
-                    const isActive = selectedComplaint?.id === c.id;
-                    return (
-                       <div key={c.id} onClick={() => handleSelectComplaint(c)} className={`group p-4 border-b border-slate-50 cursor-pointer transition-all hover:bg-slate-50 ${isActive ? 'bg-blue-50/50 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'}`}>
-                          <div className="flex justify-between items-start mb-1">
-                             <div className="flex items-center gap-2">
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getStatusStyle(c.status)}`}>
-                                  {c.status === 'open' ? t.complaints.open : 
-                                   c.status === 'in-progress' ? t.complaints.inProgress :
-                                   c.status === 'resolved' ? t.complaints.resolved :
-                                   c.status === 'escalated' ? t.complaints.escalated : c.status}
-                                </span>
-                                {c.source === 'voice' && <Headphones className="w-3 h-3 text-purple-500" />}
-                             </div>
-                             <span className="text-[10px] text-slate-400 font-medium">{formatTime(c.created_at)}</span>
-                          </div>
-                          <div className="flex items-start gap-3">
-                             <div className={`mt-1 p-1.5 rounded-md ${config.bg} ${config.color}`}><Icon className="w-4 h-4" /></div>
-                             <div className="flex-1 min-w-0">
-                                <h4 className={`text-sm font-semibold truncate ${isActive ? 'text-blue-700' : 'text-slate-800'}`}>{c.category} Issue</h4>
-                                <p className="text-xs text-slate-500 truncate mt-0.5">{c.location}</p>
-                                <p className="text-[10px] text-slate-400 mt-1 truncate">ID: {c.id}</p>
-                             </div>
-                          </div>
-                       </div>
-                    );
+                   const config = getCatConfig(c.category);
+                   const Icon = config.icon;
+                   const isActive = selectedComplaint?.id === c.id;
+                   return (
+                      <div key={c.id} onClick={() => handleSelectComplaint(c)} className={`group p-4 border-b border-slate-50 cursor-pointer transition-all hover:bg-slate-50 ${isActive ? 'bg-blue-50/50 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'}`}>
+                         <div className="flex justify-between items-start mb-1">
+                            <div className="flex items-center gap-2">
+                               <span className={`text-[10px] px-1.5 py-0.5 rounded border ${getStatusStyle(c.status)}`}>
+                                 {c.status === 'open' ? t.complaints.open : 
+                                  c.status === 'in-progress' ? t.complaints.inProgress :
+                                  c.status === 'resolved' ? t.complaints.resolved :
+                                  c.status === 'escalated' ? t.complaints.escalated : c.status}
+                               </span>
+                               {c.source === 'voice' && <Headphones className="w-3 h-3 text-purple-500" />}
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-medium">{formatTime(c.created_at)}</span>
+                         </div>
+                         <div className="flex items-start gap-3">
+                            <div className={`mt-1 p-1.5 rounded-md ${config.bg} ${config.color}`}><Icon className="w-4 h-4" /></div>
+                            <div className="flex-1 min-w-0">
+                               <h4 className={`text-sm font-semibold truncate ${isActive ? 'text-blue-700' : 'text-slate-800'}`}>{c.category} Issue</h4>
+                               <p className="text-xs text-slate-500 truncate mt-0.5">{c.location}</p>
+                               <p className="text-[10px] text-slate-400 mt-1 truncate">ID: {c.id}</p>
+                            </div>
+                         </div>
+                      </div>
+                   );
               })}
            </div>
         </Card>
@@ -266,9 +280,8 @@ export default function ComplaintsPage() {
                                 </div>
                              </div>
 
-                             {/* --- INSERTED AI ANALYSIS PANEL --- */}
-                             <AIAnalysisPanel /> 
-                             {/* ---------------------------------- */}
+                             {/* Inserted AI Analysis Panel from Main Branch */}
+                             <AIAnalysisPanel />
 
                              {selectedComplaint.source === 'voice' && (
                                 <div className="bg-purple-50/50 rounded-xl p-4 border border-purple-100">
@@ -317,6 +330,5 @@ export default function ComplaintsPage() {
            )}
         </div>
       </div>
-    </div>
-  );
+   );
 }

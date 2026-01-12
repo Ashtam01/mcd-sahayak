@@ -6,3 +6,7 @@ pydantic
 sentence-transformers
 pypdf
 httpx
+python-multipart
+twilio
+scikit-learn
+numpy

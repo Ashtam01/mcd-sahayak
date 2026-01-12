@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Map,
   Filter,
@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useZoneStore, ZONES } from '@/lib/store';
 import dynamic from 'next/dynamic';
+import { fetchHotspots } from '@/lib/api';
 
 // Dynamically import the heatmap component to avoid SSR issues
 const DelhiHeatmap = dynamic(
@@ -45,53 +46,7 @@ const DelhiHeatmap = dynamic(
 );
 
 // Hotspot data
-const hotspots = [
-  {
-    id: 1,
-    area: 'Karol Bagh',
-    zone: 'Central Delhi',
-    complaints: 234,
-    mainIssue: 'Garbage Collection',
-    severity: 'critical',
-    trend: 'increasing',
-  },
-  {
-    id: 2,
-    area: 'Dwarka Sector 12',
-    zone: 'South West Delhi',
-    complaints: 189,
-    mainIssue: 'Water Supply',
-    severity: 'high',
-    trend: 'stable',
-  },
-  {
-    id: 3,
-    area: 'Rohini Sector 7',
-    zone: 'North West Delhi',
-    complaints: 156,
-    mainIssue: 'Street Lights',
-    severity: 'high',
-    trend: 'decreasing',
-  },
-  {
-    id: 4,
-    area: 'Laxmi Nagar',
-    zone: 'East Delhi',
-    complaints: 142,
-    mainIssue: 'Road Repair',
-    severity: 'medium',
-    trend: 'increasing',
-  },
-  {
-    id: 5,
-    area: 'Saket',
-    zone: 'South Delhi',
-    complaints: 98,
-    mainIssue: 'Drainage',
-    severity: 'medium',
-    trend: 'stable',
-  },
-];
+
 
 const complaintCategories = [
   { name: 'All Categories', value: 'all' },
@@ -104,11 +59,21 @@ const complaintCategories = [
   { name: 'Parking', value: 'parking' },
 ];
 
+
 export default function HeatmapPage() {
   const [timeRange, setTimeRange] = useState('7d');
   const [category, setCategory] = useState('all');
   const [selectedZone, setSelectedZone] = useState('all');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hotspots, setHotspots] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadHotspots() {
+      const data = await fetchHotspots(selectedZone !== 'all' ? selectedZone : undefined);
+      setHotspots(data);
+    }
+    loadHotspots();
+  }, [selectedZone]);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -163,7 +128,7 @@ export default function HeatmapPage() {
               <Filter className="w-4 h-4 text-slate-400" />
               <span className="text-sm font-medium text-slate-700">Filters:</span>
             </div>
-            
+
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-[150px]">
                 <Calendar className="w-4 h-4 mr-2" />
@@ -199,7 +164,7 @@ export default function HeatmapPage() {
               <SelectContent>
                 {ZONES.map((zone) => (
                   <SelectItem key={zone.value} value={zone.value}>
-                    {zone.label}
+                    {zone.labelKey.split('.')[1] || zone.value}
                   </SelectItem>
                 ))}
               </SelectContent>

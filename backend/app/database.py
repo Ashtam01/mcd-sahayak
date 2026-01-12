@@ -9,11 +9,20 @@ load_dotenv(dotenv_path=env_path)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError(
-        f"Missing SUPABASE_URL or SUPABASE_KEY in environment variables. "
-        f"Looked for .env at: {env_path}"
-    )
+if not SUPABASE_URL:
+    raise ValueError("Missing SUPABASE_URL in environment variables.")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# Prefer Service Role Key for backend operations to bypass RLS
+key_to_use = SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY
+
+if not key_to_use:
+    raise ValueError("Missing SUPABASE_KEY or SUPABASE_SERVICE_ROLE_KEY in .env")
+
+if SUPABASE_SERVICE_ROLE_KEY:
+    print("✅ Using SUPABASE_SERVICE_ROLE_KEY (RLS Bypassed)")
+else:
+    print("⚠️  Using SUPABASE_KEY (Anon Key) - RLS Policies Required")
+
+supabase: Client = create_client(SUPABASE_URL, key_to_use)

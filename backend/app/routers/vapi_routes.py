@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from ..database import supabase
 from ..services.tools import detect_zone_and_coords, calculate_sla
 from ..services.rag_service import search_knowledge_base
+from ..services.sms_service import send_complaint_sms
 
 # THIS LINE IS CRITICAL - DO NOT MISS IT
 router = APIRouter()
@@ -85,6 +86,10 @@ async def vapi_webhook(request: Request):
                         supabase.table("complaints").insert(row).execute()
                         result_text = f"Complaint registered. Ticket {ticket_id}."
                         print(f"✅ Logged: {ticket_id}")
+                        
+                        # Send SMS Notification
+                        send_complaint_sms(phone, ticket_id, cat)
+                        
                     except Exception as e:
                         print(f"❌ DB Error: {e}")
                         result_text = "Error logging complaint to database."
